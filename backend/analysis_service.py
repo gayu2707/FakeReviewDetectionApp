@@ -1,7 +1,6 @@
 import re
 from datetime import datetime
-
-history_store = []
+from db import reviews_collection
 
 fake_keywords = [
     "best product ever",
@@ -66,7 +65,7 @@ def analyze_text_features(text):
 
     if fake_score > 20 and real_score == 0:
         fake_score += 10
-        indicators.append("Generic praise without product-specific details")
+        indicators.append("Generic praise without details")
 
     return fake_score, real_score, indicators
 
@@ -74,12 +73,8 @@ def analyze_vader(text):
     fake_score, real_score, indicators = analyze_text_features(text)
     confidence = min(100, max(0, 30 + fake_score - real_score))
 
-    if confidence >= 60:
-        result = "FAKE"
-        certainty = "High" if confidence >= 75 else "Medium"
-    else:
-        result = "REAL"
-        certainty = "Low" if confidence < 45 else "Medium"
+    result = "FAKE" if confidence >= 60 else "REAL"
+    certainty = "High" if confidence >= 75 else "Medium" if confidence >= 60 else "Low"
 
     return {
         "method": "VADER",
@@ -94,14 +89,10 @@ def analyze_shap(text):
     confidence = min(100, max(10, 45 + fake_score - real_score))
 
     if real_score == 0:
-        indicators.append("No specific product details detected")
+        indicators.append("No product details detected")
 
-    if confidence >= 60:
-        result = "FAKE"
-        certainty = "High" if confidence >= 80 else "Medium"
-    else:
-        result = "REAL"
-        certainty = "Low" if confidence < 45 else "Medium"
+    result = "FAKE" if confidence >= 60 else "REAL"
+    certainty = "High" if confidence >= 80 else "Medium" if confidence >= 60 else "Low"
 
     return {
         "method": "SHAP",
@@ -117,44 +108,28 @@ def analyze_hybrid(text):
 
     confidence = round((vader["confidence"] + shap["confidence"]) / 2)
 
-    fake_votes = 0
-    if vader["result"] == "FAKE":
-        fake_votes += 1
-    if shap["result"] == "FAKE":
-        fake_votes += 1
-
     if confidence >= 65:
         result = "FAKE"
-        certainty = "High"
     elif confidence >= 50:
         result = "SUSPICIOUS"
-        certainty = "Medium"
     else:
         result = "REAL"
-        certainty = "Low"
-
-    indicators = [
-        f'VADER: {vader["result"]}',
-        f'SHAP: {shap["result"]}',
-        f"{fake_votes}/2 methods marked as fake"
-    ]
 
     return {
         "method": "HYBRID",
         "result": result,
         "confidence": confidence,
-        "certainty": certainty,
-        "indicators": indicators,
+        "certainty": "High" if confidence >= 65 else "Medium" if confidence >= 50 else "Low",
         "components": {
             "vader": vader,
             "shap": shap
         }
     }
 
+# 🔥 SAVE TO MONGODB
 def add_single_history(text, result_data):
-    history_store.insert(0, {
-        "id": len(history_store) + 1,
-        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+    reviews_collection.insert_one({
+        "timestamp": datetime.now(),
         "text": text,
         "method": result_data["method"],
         "result": result_data["result"],
@@ -166,9 +141,8 @@ def compare_all(text):
     shap = analyze_shap(text)
     hybrid = analyze_hybrid(text)
 
-    history_store.insert(0, {
-        "id": len(history_store) + 1,
-        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+    reviews_collection.insert_one({
+        "timestamp": datetime.now(),
         "text": text,
         "method": "COMPARE",
         "result": f'VADER:{vader["result"]}, SHAP:{shap["result"]}, HYBRID:{hybrid["result"]}',
@@ -181,41 +155,40 @@ def compare_all(text):
         "hybrid": hybrid
     }
 
+# 🔥 FETCH FROM DB
 def get_history():
-    return history_store
+    data = list(reviews_collection.find({}, {"_id": 0}))
+    return data[::-1]
 
 def get_summary():
-    total = len(history_store)
-    fake = 0
-    real = 0
-    suspicious = 0
+    data = list(reviews_collection.find())
 
-    for item in history_store:
-        result_text = str(item["result"]).upper()
-        if "FAKE" in result_text:
+    fake = real = suspicious = 0
+
+    for item in data:
+        r = str(item["result"]).upper()
+        if "FAKE" in r:
             fake += 1
-        elif "SUSPICIOUS" in result_text:
+        elif "SUSPICIOUS" in r:
             suspicious += 1
-        elif "REAL" in result_text:
+        elif "REAL" in r:
             real += 1
 
     return {
-        "total_analyzed": total,
+        "total_analyzed": len(data),
         "fake": fake,
         "real": real,
         "suspicious": suspicious
     }
 
 def build_csv():
-    lines = ["id,timestamp,method,result,confidence,text"]
+    data = list(reviews_collection.find({}, {"_id": 0}))
 
-    for item in history_store:
-        escaped_text = item["text"].replace('"', '""')
-        escaped_result = str(item["result"]).replace('"', '""')
-        escaped_confidence = str(item["confidence"]).replace('"', '""')
+    lines = ["timestamp,method,result,confidence,text"]
 
+    for item in data:
         lines.append(
-            f'{item["id"]},"{item["timestamp"]}","{item["method"]}","{escaped_result}","{escaped_confidence}","{escaped_text}"'
+            f'{item["timestamp"]},"{item["method"]}","{item["result"]}","{item["confidence"]}","{item["text"]}"'
         )
 
     return "\n".join(lines)

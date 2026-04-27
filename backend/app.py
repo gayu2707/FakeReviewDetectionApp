@@ -1,15 +1,6 @@
 from flask import Flask, request, jsonify, Response
 from flask_cors import CORS
-from analysis_service import (
-    analyze_vader,
-    analyze_shap,
-    analyze_hybrid,
-    compare_all,
-    get_history,
-    get_summary,
-    build_csv,
-    add_single_history
-)
+from analysis_service import *
 
 app = Flask(__name__)
 CORS(app)
@@ -19,68 +10,48 @@ def home():
     return jsonify({"message": "Fake Review Detection API running"})
 
 @app.route("/analyze/vader", methods=["POST"])
-def analyze_vader_route():
-    data = request.get_json()
-    text = data.get("text", "").strip()
-
-    if not text:
-        return jsonify({"error": "Text is required"}), 400
-
+def vader():
+    text = request.json.get("text", "")
     result = analyze_vader(text)
     add_single_history(text, result)
     return jsonify(result)
 
 @app.route("/analyze/shap", methods=["POST"])
-def analyze_shap_route():
-    data = request.get_json()
-    text = data.get("text", "").strip()
-
-    if not text:
-        return jsonify({"error": "Text is required"}), 400
-
+def shap():
+    text = request.json.get("text", "")
     result = analyze_shap(text)
     add_single_history(text, result)
     return jsonify(result)
 
 @app.route("/analyze/hybrid", methods=["POST"])
-def analyze_hybrid_route():
-    data = request.get_json()
-    text = data.get("text", "").strip()
-
-    if not text:
-        return jsonify({"error": "Text is required"}), 400
-
+def hybrid():
+    text = request.json.get("text", "")
     result = analyze_hybrid(text)
     add_single_history(text, result)
     return jsonify(result)
 
+
 @app.route("/compare", methods=["POST"])
-def compare_route():
-    data = request.get_json()
-    text = data.get("text", "").strip()
-
-    if not text:
-        return jsonify({"error": "Text is required"}), 400
-
+def compare():
+    text = request.json.get("text", "")
     results = compare_all(text)
-    return jsonify({"results": results})
+    return jsonify({"results": results})   # ✅ wrap inside "results"
 
-@app.route("/history", methods=["GET"])
-def history_route():
+@app.route("/history")
+def history():
     return jsonify(get_history())
 
-@app.route("/reports/summary", methods=["GET"])
-def reports_summary_route():
+@app.route("/reports/summary")
+def summary():
     return jsonify(get_summary())
 
-@app.route("/reports/download", methods=["GET"])
-def reports_download_route():
-    csv_data = build_csv()
+@app.route("/reports/download")
+def download():
     return Response(
-        csv_data,
+        build_csv(),
         mimetype="text/csv",
-        headers={"Content-Disposition": "attachment; filename=analysis_report.csv"}
+        headers={"Content-Disposition": "attachment; filename=report.csv"}
     )
 
 if __name__ == "__main__":
-    app.run(debug=True, port=5000)
+    app.run(debug=True)

@@ -1,3 +1,5 @@
+import { motion } from "framer-motion";
+
 function ResultBox({ method, result, confidence, certainty, indicators = [] }) {
   const isDanger = result === "FAKE";
   const isNeutral = result === "SUSPICIOUS";
@@ -7,7 +9,12 @@ function ResultBox({ method, result, confidence, certainty, indicators = [] }) {
   if (isNeutral) themeClass = "result-neutral";
 
   return (
-    <div className={`result-box ${themeClass}`}>
+    <motion.div
+      className={`result-box ${themeClass}`}
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.3 }}
+    >
       <div className="result-box-header">
         <div className="result-left">
           <div className="result-icon">
@@ -28,9 +35,11 @@ function ResultBox({ method, result, confidence, certainty, indicators = [] }) {
       </div>
 
       <div className="progress-bar">
-        <div
+        <motion.div
           className={`progress-fill ${themeClass}`}
-          style={{ width: `${confidence}%` }}
+          initial={{ width: 0 }}
+          animate={{ width: `${confidence}%` }}
+          transition={{ duration: 0.8 }}
         />
       </div>
 
@@ -52,7 +61,7 @@ function ResultBox({ method, result, confidence, certainty, indicators = [] }) {
           <p>No indicators detected</p>
         )}
       </div>
-    </div>
+    </motion.div>
   );
 }
 

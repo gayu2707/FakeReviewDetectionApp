@@ -50,6 +50,7 @@ a {
   padding: 28px 22px;
   position: sticky;
   top: 0;
+  flex-shrink: 0;
 }
 
 .brand {
@@ -94,10 +95,6 @@ a {
   box-shadow: 0 8px 24px rgba(76, 134, 255, 0.25);
 }
 
-.nav-icon {
-  font-size: 20px;
-}
-
 .page-content {
   flex: 1;
   padding: 36px 44px;
@@ -105,14 +102,15 @@ a {
 }
 
 .page {
-  max-width: 1400px;
+  max-width: 1300px;
+  width: 100%;
 }
 
 .page-title {
   font-size: 42px;
   font-weight: 800;
   line-height: 1.15;
-  margin-bottom: 16px;
+  margin-bottom: 14px;
   color: white;
 }
 
@@ -122,22 +120,34 @@ a {
   margin-bottom: 28px;
 }
 
+/* Dashboard */
 .method-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(220px, 1fr));
-  gap: 22px;
-  max-width: 980px;
+  grid-template-columns: repeat(3, minmax(240px, 1fr));
+  gap: 24px;
+  max-width: 1100px;
+  margin-top: 10px;
+}
+
+.method-card-wrapper {
+  width: 100%;
 }
 
 .method-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
   background: var(--card-bg);
   border: 1px solid var(--border);
-  border-radius: 20px;
+  border-radius: 22px;
   padding: 28px 24px;
   text-decoration: none;
   color: white;
   transition: all 0.25s ease;
-  min-height: 200px;
+  min-height: 220px;
+  width: 100%;
+  overflow: hidden;
 }
 
 .method-card:hover {
@@ -147,21 +157,25 @@ a {
 }
 
 .method-icon {
-  font-size: 28px;
-  margin-bottom: 14px;
+  font-size: 30px;
+  margin-bottom: 18px;
+  line-height: 1;
 }
 
 .method-card h2 {
   font-size: 24px;
   margin-bottom: 12px;
+  font-weight: 800;
 }
 
 .method-card p {
   font-size: 16px;
-  line-height: 1.5;
+  line-height: 1.6;
   color: var(--text-soft);
+  max-width: 95%;
 }
 
+/* Inputs and buttons */
 .review-input {
   width: 100%;
   min-height: 140px;
@@ -215,6 +229,7 @@ a {
   font-size: 15px;
 }
 
+/* Result cards */
 .result-box {
   margin-top: 30px;
   border-radius: 20px;
@@ -339,6 +354,7 @@ a {
   line-height: 1.5;
 }
 
+/* Compare chart */
 .chart-card {
   margin-top: 28px;
   background: var(--card-bg);
@@ -422,6 +438,7 @@ a {
   font-weight: 700;
 }
 
+/* Compare cards */
 .compare-card-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -500,8 +517,10 @@ a {
   font-weight: 800;
 }
 
+/* Tables / reports */
 .table-card,
-.report-card {
+.report-card,
+.info-card {
   background: var(--card-bg);
   border: 1px solid var(--border);
   border-radius: 20px;
@@ -516,14 +535,28 @@ a {
   gap: 24px;
 }
 
-.report-card h2 {
+.report-card h2,
+.info-card h2 {
   font-size: 20px;
   margin-bottom: 10px;
 }
 
-.report-card p {
+.report-card p,
+.info-card p {
   color: var(--text-soft);
   font-size: 14px;
+  line-height: 1.6;
+}
+
+.info-list {
+  padding-left: 20px;
+  margin-top: 8px;
+}
+
+.info-list li {
+  color: var(--text-soft);
+  font-size: 14px;
+  margin-bottom: 10px;
   line-height: 1.6;
 }
 
@@ -601,5 +634,226 @@ a {
 
   .result-score-wrap {
     text-align: left;
+  }
+}
+
+/* Dashboard stats */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+  margin-bottom: 28px;
+  max-width: 1100px;
+}
+
+.stat-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 18px 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.stat-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.stat-title {
+  font-size: 13px;
+  color: var(--text-soft);
+  margin-bottom: 4px;
+}
+
+.stat-value {
+  font-size: 24px;
+  font-weight: 800;
+  color: white;
+}
+
+.stat-blue .stat-icon {
+  color: #66a3ff;
+}
+
+.stat-red .stat-icon {
+  color: #ff7f7f;
+}
+
+.stat-green .stat-icon {
+  color: #46e0a8;
+}
+
+.stat-yellow .stat-icon {
+  color: #f7c04a;
+}
+
+/* Recent activity */
+.recent-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 22px 24px;
+  margin-top: 28px;
+  max-width: 1100px;
+}
+
+.recent-card h2 {
+  font-size: 20px;
+  margin-bottom: 16px;
+}
+
+.recent-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.recent-item {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text-soft);
+  font-size: 14px;
+}
+
+/* Reports charts */
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+  margin-top: 24px;
+}
+
+.chart-box {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 20px;
+}
+
+.chart-box h3 {
+  font-size: 18px;
+  margin-bottom: 14px;
+}
+
+/* History filters */
+.filter-bar {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-top: 18px;
+  margin-bottom: 20px;
+}
+
+.filter-input,
+.filter-select {
+  background: var(--card-soft);
+  color: white;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-size: 14px;
+  outline: none;
+}
+
+.filter-input {
+  min-width: 300px;
+  flex: 1;
+}
+
+.filter-select {
+  min-width: 160px;
+}
+
+.history-text-cell {
+  max-width: 320px;
+  color: var(--text-soft);
+}
+
+/* Support form */
+.support-grid {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 24px;
+  margin-top: 10px;
+}
+
+.support-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 14px;
+}
+
+.support-input,
+.support-textarea {
+  width: 100%;
+  background: var(--card-soft);
+  color: white;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 16px;
+  font-size: 14px;
+  outline: none;
+}
+
+.support-textarea {
+  min-height: 140px;
+  resize: vertical;
+}
+
+.success-message {
+  color: #61f0c1;
+  font-size: 14px;
+  margin-top: 10px;
+}
+
+/* FAQ */
+.faq-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.faq-item {
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 14px;
+  overflow: hidden;
+  background: rgba(255,255,255,0.03);
+}
+
+.faq-question {
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  color: white;
+  border: none;
+  padding: 16px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.faq-answer {
+  padding: 0 16px 16px 16px;
+  color: var(--text-soft);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+@media (max-width: 1200px) {
+  .stats-grid,
+  .charts-grid,
+  .support-grid {
+    grid-template-columns: 1fr;
   }
 }
