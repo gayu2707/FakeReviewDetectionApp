@@ -128,26 +128,40 @@ def analyze_hybrid(text):
 
 # 🔥 SAVE TO MONGODB
 def add_single_history(text, result_data):
-    reviews_collection.insert_one({
-        "timestamp": datetime.now(),
-        "text": text,
-        "method": result_data["method"],
-        "result": result_data["result"],
-        "confidence": result_data["confidence"]
-    })
+    try:
+        doc = {
+            "timestamp": datetime.utcnow(),
+            "text": text,
+            "method": result_data.get("method"),
+            "result": result_data.get("result"),
+            "confidence": result_data.get("confidence")
+        }
+
+        result = reviews_collection.insert_one(doc)
+
+        print("✅ Inserted ID:", result.inserted_id)
+
+    except Exception as e:
+        print("❌ MongoDB Insert Error:", str(e))
 
 def compare_all(text):
     vader = analyze_vader(text)
     shap = analyze_shap(text)
     hybrid = analyze_hybrid(text)
 
-    reviews_collection.insert_one({
-        "timestamp": datetime.now(),
-        "text": text,
-        "method": "COMPARE",
-        "result": f'VADER:{vader["result"]}, SHAP:{shap["result"]}, HYBRID:{hybrid["result"]}',
-        "confidence": f'V:{vader["confidence"]}% S:{shap["confidence"]}% H:{hybrid["confidence"]}%'
-    })
+    try:
+        reviews_collection.insert_one({
+            "timestamp": datetime.utcnow(),
+            "text": text,
+            "method": "COMPARE",
+            "result": f'VADER:{vader["result"]}, SHAP:{shap["result"]}, HYBRID:{hybrid["result"]}',
+            "confidence": f'V:{vader["confidence"]}% S:{shap["confidence"]}% H:{hybrid["confidence"]}%'
+        })
+
+        print("✅ Compare data inserted")
+
+    except Exception as e:
+        print("❌ Compare Insert Error:", str(e))
 
     return {
         "vader": vader,
