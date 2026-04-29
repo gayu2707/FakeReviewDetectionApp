@@ -3,6 +3,7 @@ Flask-Cors==4.0.1
 pymongo
 dnspython
 python-dotenv
+certifi
 nltk
 pandas
 numpy
