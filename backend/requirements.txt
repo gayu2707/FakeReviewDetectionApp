@@ -5,6 +5,3 @@ dnspython
 python-dotenv
 certifi
 nltk
-pandas
-numpy
-scikit-learn
